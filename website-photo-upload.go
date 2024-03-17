@@ -55,7 +55,7 @@ func putUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//io.WriteString(w, "upload processed successfully\n")
-	http.Redirect(w, r, "/", http.StatusFound)
+	http.Redirect(w, r, "./html/upload.html", http.StatusFound)
 }
 
 // saveUploadedFile ...
@@ -121,7 +121,7 @@ func main() {
 	mux.Handle("/html/", http.StripPrefix("/html/", http.FileServer(http.Dir("./html"))))
 	mux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images/"))))
 	mux.HandleFunc("/api/thumbs", jsonDirList)
-	mux.Handle("/", http.RedirectHandler("/html/upload.html", http.StatusSeeOther))
+	mux.Handle("/", http.RedirectHandler("./html/upload.html", http.StatusSeeOther))
 	mux.HandleFunc("/upload", putUpload)
 
 	log.Printf("starting server on %s", bindHost)

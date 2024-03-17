@@ -1,53 +1,102 @@
 <!doctype html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <title>Katharina und Tim</title>
     <!-- Bootstrap -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css"
+          integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-      <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
-      <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/html5shiv@3.7.3/dist/html5shiv.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/respond.js@1.4.2/dest/respond.min.js"></script>
     <![endif]-->
-  </head>
-  <body>
-    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
-    <script src="https://code.jquery.com/jquery-1.12.4.min.js" integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ" crossorigin="anonymous"></script>
-    <!-- Include all compiled plugins (below), or include individual files as needed -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js" integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd" crossorigin="anonymous"></script>
-  <h1>Katharina & Tim 💍</h1>
+</head>
+<body>
+<!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+<script src="https://code.jquery.com/jquery-1.12.4.min.js"
+        integrity="sha384-nvAa0+6Qg9clwYCGGPpDQLVpLNn0fRaROjHqs13t4Ggj3Ez50XnGQqc/r8MhnRDZ"
+        crossorigin="anonymous"></script>
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/js/bootstrap.min.js"
+        integrity="sha384-aJ21OjlMXNL5UyIl/XNwTMqvzeRMZH2w8c5cRVpzpU8Y5bApTppSuUkhZXN0VxHd"
+        crossorigin="anonymous"></script>
+<h1>Katharina & Tim 💍</h1>
 
 <h2>Foto Sharing</h2>
 
-    <button id="custom-upload-button" type="button" class="btn btn-lg btn-success">Bilder auswählen & hochladen</button>
+<button id="custom-upload-button" type="button" class="btn btn-lg btn-success">Bilder auswählen & hochladen</button>
 <form id="imageForm" action="upload" method="POST" enctype="multipart/form-data">
-<input class="btn btn-lg btn-primary" id="imageInput" name="imageInputName" type="file" accept="image/*" style="display: none;" multiple>
-<input type="submit" style="display: none;">
+    <input class="btn btn-lg btn-primary" id="imageInput" name="imageInputName" type="file" accept="image/*"
+           style="display: none;" multiple>
+    <input type="submit" style="display: none;">
 </form>
+
+
+<div class="progress">
+    <div id="progressbarbs" class="progress-bar progress-bar-striped" role="progressbar"></div>
+</div>
+
 <h2>💝</h2>
 
 <script>
-document.getElementById('imageInput').addEventListener('change', function() {
-    document.getElementById('imageForm').submit();
-});
-    document.getElementById('custom-upload-button').addEventListener('click', function() {
-  document.getElementById('imageInput').click();
-});
+    // we just submit when there's a change; bypass the "form submit".
+    // form submit _will_ also work but here we can get progress
+    document.getElementById('imageForm').addEventListener('change', function () {
+
+        console.log(this);
+        const formData = new FormData(this); // Get form data
+        const xhr = new XMLHttpRequest(); // Create XMLHttpRequest object
+
+        xhr.open('POST', 'upload', true); // Open a POST request
+
+        xhr.upload.onprogress = function (event) { // Progress event listener
+            if (event.lengthComputable) {
+                //console.log('Uploading', event);
+                const percentComplete = (event.loaded / event.total) * 100;
+                progressbarbs = document.getElementById('progressbarbs');
+                progressbarbs.style.width = percentComplete + '%';
+                progressbarbs.setAttribute('aria-valuenow', percentComplete);
+                progressbarbs.innerText = percentComplete + '%';
+            }
+        };
+
+        xhr.onload = function () { // Load event listener
+            if (xhr.status === 200) {
+                console.log('Upload successful');
+                renderThumbnails();
+            } else {
+                console.error('Upload failed');
+            }
+        };
+
+        xhr.onerror = function () { // Error event listener
+            console.error('Error occurred during upload');
+        };
+
+        xhr.send(formData); // Send form data
+
+
+        //document.getElementById('imageForm').submit();
+    });
+    document.getElementById('custom-upload-button').addEventListener('click', function () {
+        document.getElementById('imageInput').click();
+    });
+
 </script>
 
 
-  <div class="container-fluid"  id="thumbnails">
+<div class="container-fluid" id="thumbnails">
 
-  </div>
+</div>
 
 
-  <script>
+<script>
     // Replace 'API_ENDPOINT' with the actual API endpoint that returns the directory listing with thumbnail URLs
     const API_ENDPOINT = 'api/thumbs';
 
@@ -70,17 +119,17 @@ document.getElementById('imageInput').addEventListener('change', function() {
             // thumbnailHeaderDiv.classList.add('panel-heading');
             // thumbnailHeaderDiv.appendChild(thumbnailHeaderH3)
 
-          const thumbLink = document.createElement('a');
-          thumbLink.href = item.img_path;
+            const thumbLink = document.createElement('a');
+            thumbLink.href = item.img_path;
 
-          const thumbnailImg = document.createElement('img');
-          thumbnailImg.classList.add("img-thumbnail")
-          thumbnailImg.src = item.thumb_path;
-          thumbnailImg.alt = item.name;
+            const thumbnailImg = document.createElement('img');
+            thumbnailImg.classList.add("img-thumbnail")
+            thumbnailImg.src = item.thumb_path;
+            thumbnailImg.alt = item.name;
 
-          thumbLink.appendChild(thumbnailImg)
+            thumbLink.appendChild(thumbnailImg)
 
-          thumbnailsContainer.appendChild(thumbLink)
+            thumbnailsContainer.appendChild(thumbLink)
 
             // const thumbnailDiv = document.createElement('div');
             // thumbnailDiv.classList.add('panel-body');
@@ -101,9 +150,12 @@ document.getElementById('imageInput').addEventListener('change', function() {
     }
 
     renderThumbnails();
+    setInterval(function () {
+        renderThumbnails();
+    }, 30000);
 </script>
 
 
-  </body>
+</body>
 </html>
 

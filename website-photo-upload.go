@@ -89,7 +89,10 @@ func saveUploadedFile(h *multipart.FileHeader) error {
 		log.Printf("error writing to local file %q: %v", targetPath, err)
 		return err
 	}
-	makeThumbnail(targetPath)
+	err = makeThumbnail(targetPath)
+	if err != nil {
+		os.Remove(targetPath)
+	}
 	return nil
 }
 

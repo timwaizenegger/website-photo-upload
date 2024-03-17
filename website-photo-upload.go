@@ -29,37 +29,35 @@ const (
 
 func putUpload(w http.ResponseWriter, r *http.Request) {
 	log.Printf("upload %q %q %q", r, r.URL, r.Method)
-	if r.Method == http.MethodPost {
-		err := r.ParseMultipartForm(1000 * 1024 * 1024)
-		if err != nil {
-			log.Printf("error parsing multipart form: %v", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
-		// Get a reference to the file
-		_, _, err = r.FormFile("imageInputName")
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
-		}
-		// TODO: return error if any happened
-		for k, v := range r.MultipartForm.File {
-			log.Printf("got a file %s", k)
-			for _, header := range v {
-				log.Printf("got a file header %v", header.Filename)
-				err = saveUploadedFile(header)
-				if err != nil {
-					log.Printf("error saving file header: %v", err)
-				}
-			}
-		}
-
-		//io.WriteString(w, "upload processed successfully\n")
-		http.Redirect(w, r, "./upload", http.StatusFound)
+	err := r.ParseMultipartForm(1000 * 1024 * 1024)
+	if err != nil {
+		log.Printf("error parsing multipart form: %v", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
-	serveMainPage(w, r)
+	// Get a reference to the file
+	_, _, err = r.FormFile("imageInputName")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	// TODO: return error if any happened
+	for k, v := range r.MultipartForm.File {
+		log.Printf("got a file %s", k)
+		for _, header := range v {
+			log.Printf("got a file header %v", header.Filename)
+			err = saveUploadedFile(header)
+			if err != nil {
+				log.Printf("error saving file header: %v", err)
+			}
+		}
+	}
+
+	//io.WriteString(w, "upload processed successfully\n")
+	//http.Redirect(w, r, "./upload", http.StatusFound)
+	http.ServeFile(w, r, "html/reloader.html")
+	// serveMainPage(w, r)
 }
 
 // saveUploadedFile ...
@@ -130,7 +128,9 @@ func main() {
 	mux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images/"))))
 	mux.HandleFunc("/api/thumbs", jsonDirList)
 	//mux.HandleFunc("/start", serveMainPage)
-	mux.HandleFunc("/upload", putUpload)
+	mux.HandleFunc("GET /{$}", serveMainPage)
+	mux.HandleFunc("GET /upload", serveMainPage)
+	mux.HandleFunc("POST /upload", putUpload)
 
 	log.Printf("starting server on %s", bindHost)
 	//err := http.ListenAndServe("127.0.0.1:3333", mux)

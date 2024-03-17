@@ -26,7 +26,7 @@
 <h2>Bilder hochladen</h2>
 
     <button id="custom-upload-button" type="button" class="btn btn-lg btn-success">Bilder auswählen & hochladen</button>
-<form id="imageForm" action="../upload" method="POST" enctype="multipart/form-data">
+<form id="imageForm" action="upload" method="POST" enctype="multipart/form-data">
 <input class="btn btn-lg btn-primary" id="imageInput" name="imageInputName" type="file" accept="image/*" style="display: none;" multiple>
 <input type="submit" style="display: none;">
 </form>
@@ -49,7 +49,7 @@ document.getElementById('imageInput').addEventListener('change', function() {
 
   <script>
     // Replace 'API_ENDPOINT' with the actual API endpoint that returns the directory listing with thumbnail URLs
-    const API_ENDPOINT = '../api/thumbs';
+    const API_ENDPOINT = 'api/thumbs';
 
     // Function to fetch directory listing and render thumbnails
     async function renderThumbnails() {

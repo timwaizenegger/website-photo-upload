@@ -18,7 +18,7 @@ RUN apt-get update && apt-get --no-install-recommends install -y imagemagick && 
 
 COPY --from=builder /usr/local/bin/website-photo-upload /usr/local/bin/website-photo-upload
 COPY html /app/html
-RUN chown 1100:1100 -R /app
+RUN mkdir -p /app/images/thumbs && chown 1100:1100 -R /app
 WORKDIR /app
 
 USER 1100

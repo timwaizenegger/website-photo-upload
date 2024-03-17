@@ -56,7 +56,7 @@ func putUpload(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//io.WriteString(w, "upload processed successfully\n")
-		//http.Redirect(w, r, "./html/upload.html", http.StatusFound)
+		http.Redirect(w, r, "upload", http.StatusFound)
 	}
 
 	serveMainPage(w, r)
@@ -104,7 +104,7 @@ func makeThumbnail(imagePath string) error {
 
 	log.Printf("making a thumbnail for %q. Will pace the file at %q", imagePath, outPath)
 	ret, err := imagick.ConvertImageCommand([]string{
-		"convert", imagePath, "-thumbnail", "256x256", outPath,
+		"convert", imagePath, "-auto-orient", "-thumbnail", "256x256", outPath,
 	})
 	if err != nil {
 		log.Printf("ERROR making a thumbnail for %q, %s", imagePath, err)

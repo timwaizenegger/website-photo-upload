@@ -27,6 +27,7 @@ type fileInfo struct {
 	Name      string `json:"name"`
 	ThumbName string `json:"thumb_name"`
 	ThumbPath string `json:"thumb_path"`
+	ImgPath   string `json:"img_path"`
 }
 
 func listFiles(dir string) ([]fileInfo, error) {
@@ -41,6 +42,7 @@ func listFiles(dir string) ([]fileInfo, error) {
 				Name:      de.Name(),
 				ThumbName: fmt.Sprintf("%s%s", de.Name(), thumbSuffix),
 				ThumbPath: fmt.Sprintf("%s%s%s", thumbPath, de.Name(), thumbSuffix),
+				ImgPath:   fmt.Sprintf("%s%s", imagePath, de.Name()),
 			})
 		}
 	}

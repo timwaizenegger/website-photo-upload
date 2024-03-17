@@ -70,12 +70,17 @@ document.getElementById('imageInput').addEventListener('change', function() {
             // thumbnailHeaderDiv.classList.add('panel-heading');
             // thumbnailHeaderDiv.appendChild(thumbnailHeaderH3)
 
+          const thumbLink = document.createElement('a');
+          thumbLink.href = item.img_path;
+
           const thumbnailImg = document.createElement('img');
           thumbnailImg.classList.add("img-thumbnail")
           thumbnailImg.src = item.thumb_path;
           thumbnailImg.alt = item.name;
 
-          thumbnailsContainer.appendChild(thumbnailImg)
+          thumbLink.appendChild(thumbnailImg)
+
+          thumbnailsContainer.appendChild(thumbLink)
 
             // const thumbnailDiv = document.createElement('div');
             // thumbnailDiv.classList.add('panel-body');

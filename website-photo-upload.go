@@ -3,7 +3,7 @@ package main
 import (
 	"crypto/sha256"
 	"fmt"
-	"gopkg.in/gographics/imagick.v3/imagick"
+	"gopkg.in/gographics/imagick.v2/imagick"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -14,12 +14,14 @@ import (
 
 // Notes:
 // export CGO_CFLAGS_ALLOW='-Xpreprocessor'
+// might need export PKG_CONFIG_PATH="/opt/homebrew/opt/imagemagick@6/lib/pkgconfig"
 
 var (
 	mw *imagick.MagickWand
 )
 
 const (
+	bindHost    = "0.0.0.0:3333"
 	imagePath   = "./images/"
 	thumbPath   = "./images/thumbs/"
 	thumbSuffix = ".thumb.jpg"
@@ -109,7 +111,7 @@ func makeThumbnail(imagePath string) error {
 }
 
 func main() {
-
+	log.Printf("starting 'website-photo-upload' ... ")
 	imagick.Initialize()
 	defer imagick.Terminate()
 
@@ -122,10 +124,11 @@ func main() {
 	mux.Handle("/", http.RedirectHandler("/html/upload.html", http.StatusSeeOther))
 	mux.HandleFunc("/upload", putUpload)
 
+	log.Printf("starting server on %s", bindHost)
 	//err := http.ListenAndServe("127.0.0.1:3333", mux)
-	err := http.ListenAndServe("0.0.0.0:3333", mux)
+	err := http.ListenAndServe(bindHost, mux)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Printf("hallo")
+	log.Printf("finished server on %s", bindHost)
 }

@@ -42,9 +42,8 @@ document.getElementById('imageInput').addEventListener('change', function() {
 </script>
 
 
-  <div class="container-fluid">
-    <div class="row" id="thumbnails">
-    </div>
+  <div class="container-fluid"  id="thumbnails">
+
   </div>
 
 
@@ -60,17 +59,39 @@ document.getElementById('imageInput').addEventListener('change', function() {
         const thumbnailsContainer = document.getElementById('thumbnails');
 
         data.forEach(item => {
-            const thumbnailDiv = document.createElement('div');
-            //thumbnailDiv.classList.add('thumbnail');
-            thumbnailDiv.classList.add('col-sm-6');
-            thumbnailDiv.classList.add('col-lg-3');
 
-            const thumbnailImg = document.createElement('img');
-            thumbnailImg.src = item.thumb_path;
-            thumbnailImg.alt = item.name;
 
-            thumbnailDiv.appendChild(thumbnailImg);
-            thumbnailsContainer.appendChild(thumbnailDiv);
+            //
+            // const thumbnailHeaderH3 = document.createElement('h3')
+            // thumbnailHeaderH3.classList.add('panel-title');
+            // thumbnailHeaderH3.textContent = item.name
+            //
+            // const thumbnailHeaderDiv = document.createElement('div');
+            // thumbnailHeaderDiv.classList.add('panel-heading');
+            // thumbnailHeaderDiv.appendChild(thumbnailHeaderH3)
+
+          const thumbnailImg = document.createElement('img');
+          thumbnailImg.classList.add("img-thumbnail")
+          thumbnailImg.src = item.thumb_path;
+          thumbnailImg.alt = item.name;
+
+          thumbnailsContainer.appendChild(thumbnailImg)
+
+            // const thumbnailDiv = document.createElement('div');
+            // thumbnailDiv.classList.add('panel-body');
+            // thumbnailDiv.appendChild(thumbnailImg);
+            //
+            // const thumbnailPanelDiv = document.createElement('div');
+            // thumbnailPanelDiv.classList.add("panel")
+            // thumbnailPanelDiv.classList.add("panel-success")
+            // thumbnailPanelDiv.classList.add('col-sm-6');
+            // thumbnailPanelDiv.classList.add('col-lg-3');
+            // thumbnailPanelDiv.appendChild(thumbnailDiv)
+            // thumbnailPanelDiv.appendChild(thumbnailHeaderDiv)
+            //
+            //
+            //
+            // thumbnailsContainer.appendChild(thumbnailPanelDiv);
         });
     }
 

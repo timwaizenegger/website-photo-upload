@@ -29,33 +29,36 @@ const (
 
 func putUpload(w http.ResponseWriter, r *http.Request) {
 	log.Printf("upload %q %q %q", r, r.URL, r.Method)
-	err := r.ParseMultipartForm(1000 * 1024 * 1024)
-	if err != nil {
-		log.Printf("error parsing multipart form: %v", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	if r.Method == http.MethodPost {
+		err := r.ParseMultipartForm(1000 * 1024 * 1024)
+		if err != nil {
+			log.Printf("error parsing multipart form: %v", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
-	// Get a reference to the file
-	_, _, err = r.FormFile("imageInputName")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	// TODO: return error if any happened
-	for k, v := range r.MultipartForm.File {
-		log.Printf("got a file %s", k)
-		for _, header := range v {
-			log.Printf("got a file header %v", header.Filename)
-			err = saveUploadedFile(header)
-			if err != nil {
-				log.Printf("error saving file header: %v", err)
+		// Get a reference to the file
+		_, _, err = r.FormFile("imageInputName")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		// TODO: return error if any happened
+		for k, v := range r.MultipartForm.File {
+			log.Printf("got a file %s", k)
+			for _, header := range v {
+				log.Printf("got a file header %v", header.Filename)
+				err = saveUploadedFile(header)
+				if err != nil {
+					log.Printf("error saving file header: %v", err)
+				}
 			}
 		}
+
+		//io.WriteString(w, "upload processed successfully\n")
+		//http.Redirect(w, r, "./html/upload.html", http.StatusFound)
 	}
 
-	//io.WriteString(w, "upload processed successfully\n")
-	//http.Redirect(w, r, "./html/upload.html", http.StatusFound)
 	serveMainPage(w, r)
 }
 
@@ -123,10 +126,10 @@ func main() {
 	mw = imagick.NewMagickWand()
 
 	mux := http.NewServeMux()
-	mux.Handle("/html/", http.StripPrefix("/html/", http.FileServer(http.Dir("./html"))))
+	//mux.Handle("/html/", http.StripPrefix("/html/", http.FileServer(http.Dir("./html"))))
 	mux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images/"))))
 	mux.HandleFunc("/api/thumbs", jsonDirList)
-	mux.HandleFunc("/", serveMainPage)
+	//mux.HandleFunc("/start", serveMainPage)
 	mux.HandleFunc("/upload", putUpload)
 
 	log.Printf("starting server on %s", bindHost)

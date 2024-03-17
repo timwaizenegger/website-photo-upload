@@ -40,7 +40,7 @@ func listFiles(dir string) ([]fileInfo, error) {
 			files = append(files, fileInfo{
 				Name:      de.Name(),
 				ThumbName: fmt.Sprintf("%s%s", de.Name(), thumbSuffix),
-				ThumbPath: fmt.Sprintf("../%s%s%s", thumbPath, de.Name(), thumbSuffix),
+				ThumbPath: fmt.Sprintf("%s%s%s", thumbPath, de.Name(), thumbSuffix),
 			})
 		}
 	}

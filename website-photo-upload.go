@@ -28,7 +28,7 @@ const (
 )
 
 func putUpload(w http.ResponseWriter, r *http.Request) {
-	log.Printf("upload %q %q", r.URL, r.Method)
+	log.Printf("upload %q %q %q", r, r.URL, r.Method)
 	err := r.ParseMultipartForm(1000 * 1024 * 1024)
 	if err != nil {
 		log.Printf("error parsing multipart form: %v", err)
@@ -55,7 +55,8 @@ func putUpload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	//io.WriteString(w, "upload processed successfully\n")
-	http.Redirect(w, r, "./html/upload.html", http.StatusFound)
+	//http.Redirect(w, r, "./html/upload.html", http.StatusFound)
+	serveMainPage(w, r)
 }
 
 // saveUploadedFile ...
@@ -110,6 +111,10 @@ func makeThumbnail(imagePath string) error {
 	return nil
 }
 
+func serveMainPage(w http.ResponseWriter, r *http.Request) {
+	http.ServeFile(w, r, "html/upload.html")
+}
+
 func main() {
 	log.Printf("starting 'website-photo-upload' ... ")
 	imagick.Initialize()
@@ -121,7 +126,7 @@ func main() {
 	mux.Handle("/html/", http.StripPrefix("/html/", http.FileServer(http.Dir("./html"))))
 	mux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images/"))))
 	mux.HandleFunc("/api/thumbs", jsonDirList)
-	mux.Handle("/", http.RedirectHandler("./html/upload.html", http.StatusSeeOther))
+	mux.HandleFunc("/", serveMainPage)
 	mux.HandleFunc("/upload", putUpload)
 
 	log.Printf("starting server on %s", bindHost)

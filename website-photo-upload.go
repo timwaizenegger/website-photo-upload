@@ -56,7 +56,7 @@ func putUpload(w http.ResponseWriter, r *http.Request) {
 		}
 
 		//io.WriteString(w, "upload processed successfully\n")
-		http.Redirect(w, r, "upload", http.StatusFound)
+		http.Redirect(w, r, "./upload", http.StatusFound)
 	}
 
 	serveMainPage(w, r)

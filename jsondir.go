@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"sort"
 )
 
 func jsonDirList(w http.ResponseWriter, r *http.Request) {
@@ -28,6 +29,22 @@ type fileInfo struct {
 	ThumbName string `json:"thumb_name"`
 	ThumbPath string `json:"thumb_path"`
 	ImgPath   string `json:"img_path"`
+	TimeStamp string `json:"time_stamp"`
+	GroupName string `json:"group_name"`
+}
+
+type ByNameAplhabetically []fileInfo
+
+func (a ByNameAplhabetically) Len() int {
+	return len(a)
+}
+
+func (a ByNameAplhabetically) Swap(i, j int) {
+	a[i], a[j] = a[j], a[i]
+}
+
+func (a ByNameAplhabetically) Less(i, j int) bool {
+	return a[i].Name > a[j].Name
 }
 
 func listFiles(dir string) ([]fileInfo, error) {
@@ -38,13 +55,17 @@ func listFiles(dir string) ([]fileInfo, error) {
 	}
 	for _, de := range dirEntries {
 		if !de.IsDir() {
+			t := filenameToTime(de.Name())
 			files = append(files, fileInfo{
 				Name:      de.Name(),
 				ThumbName: fmt.Sprintf("%s%s", de.Name(), thumbSuffix),
 				ThumbPath: fmt.Sprintf("%s%s%s", thumbPath, de.Name(), thumbSuffix),
 				ImgPath:   fmt.Sprintf("%s%s", imagePath, de.Name()),
+				TimeStamp: fmt.Sprintf("%s", t),
+				GroupName: groupNameForDate(t),
 			})
 		}
 	}
+	sort.Sort(ByNameAplhabetically(files))
 	return files, nil
 }

@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"crypto/sha256"
 	"fmt"
+	"github.com/rwcarlsen/goexif/exif"
 	"gopkg.in/gographics/imagick.v2/imagick"
 	"log"
 	"mime/multipart"
@@ -10,6 +12,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"time"
 )
 
 // Notes:
@@ -21,10 +24,11 @@ var (
 )
 
 const (
-	bindHost    = "0.0.0.0:3333"
-	imagePath   = "./images/"
-	thumbPath   = "./images/thumbs/"
-	thumbSuffix = ".thumb.jpg"
+	bindHost          = "0.0.0.0:3333"
+	imagePath         = "./images/"
+	thumbPath         = "./images/thumbs/"
+	thumbSuffix       = ".thumb.jpg"
+	patternTimePrefix = "2006-01-02_15-04"
 )
 
 func putUpload(w http.ResponseWriter, r *http.Request) {
@@ -60,6 +64,57 @@ func putUpload(w http.ResponseWriter, r *http.Request) {
 	// serveMainPage(w, r)
 }
 
+func getExifDate(file *[]byte) time.Time {
+	// Decode the EXIF data
+	x, err := exif.Decode(bytes.NewReader(*file))
+	if err != nil {
+		log.Printf("can't get exif: %s", err)
+		return time.Now()
+	}
+
+	// Extract and print specific tags
+	focalLength, _ := x.Get(exif.FocalLength)
+	fmt.Println("Focal Length:", focalLength)
+
+	exposureTime, _ := x.Get(exif.ExposureTime)
+	fmt.Println("Exposure Time:", exposureTime)
+
+	dt, err := x.DateTime()
+	if err != nil {
+		log.Printf("can't get DateTime from exif: %s", err)
+		return time.Now()
+	}
+	//dateTime, _ := x.Get(exif.DateTime)
+	//fmt.Println("Date Time:", dateTime)
+	fmt.Println("Date Time native:", dt)
+
+	return dt
+}
+
+func timeToNamePrefix(t time.Time) string {
+	return t.Format(patternTimePrefix)
+}
+
+func filenameToTime(s string) time.Time {
+	if len(s) < len(patternTimePrefix) {
+		log.Printf("unable to extract time from name %q, name too short", s)
+		return time.Now()
+	}
+	prefix := s[:len(patternTimePrefix)]
+	t, err := time.Parse(patternTimePrefix, prefix)
+	if err != nil {
+		log.Printf("unable to extract time from name %q, err: %s", s, err)
+		return time.Now()
+	}
+	return t
+}
+
+func groupNameForDate(t time.Time) string {
+	namePatt := "15 Uhr, 02.01.2006"
+	name := t.Format(namePatt)
+	return name
+}
+
 // saveUploadedFile ...
 // TODO: save as sha sum key
 func saveUploadedFile(h *multipart.FileHeader) error {
@@ -73,11 +128,14 @@ func saveUploadedFile(h *multipart.FileHeader) error {
 	buffer := make([]byte, h.Size)
 	f.Read(buffer)
 	sum := sha256.Sum256(buffer)
+	exifDate := getExifDate(&buffer)
+	timePrefix := timeToNamePrefix(exifDate)
+	log.Printf("got exif date as %s - prefix is %q", exifDate, timePrefix)
 	ext := filepath.Ext(h.Filename)
 	if ext == "" {
 		ext = ".jpg"
 	}
-	fileName := fmt.Sprintf("%x%s", sum[:], ext)
+	fileName := fmt.Sprintf("%s_%x%s", timePrefix, sum[:], ext)
 	targetPath := filepath.Join(imagePath, fileName)
 	out, err := os.Create(targetPath)
 	if err != nil {
@@ -103,9 +161,9 @@ func makeThumbnail(imagePath string) error {
 	outName := fmt.Sprintf("%s%s", imageName, thumbSuffix)
 	outPath := path.Join(outDir, outName)
 
-	log.Printf("making a thumbnail for %q. Will pace the file at %q", imagePath, outPath)
+	log.Printf("making a thumbnail for %q. Will place the file at %q", imagePath, outPath)
 	ret, err := imagick.ConvertImageCommand([]string{
-		"convert", imagePath, "-auto-orient", "-thumbnail", "256x256", outPath,
+		"convert", imagePath, "-auto-orient", "-thumbnail", "200x200", outPath,
 	})
 	if err != nil {
 		log.Printf("ERROR making a thumbnail for %q, %s", imagePath, err)

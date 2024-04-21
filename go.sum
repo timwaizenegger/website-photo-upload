@@ -1,2 +1,4 @@
+github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd h1:CmH9+J6ZSsIjUK3dcGsnCnO41eRBOnY12zwkn5qVwgc=
+github.com/rwcarlsen/goexif v0.0.0-20190401172101-9e8deecbddbd/go.mod h1:hPqNNc0+uJM6H+SuU8sEs5K5IQeKccPqeSjfgcKGgPk=
 gopkg.in/gographics/imagick.v2 v2.6.3 h1:m1l5y3HMoYsXLRSDK3VQyK/xjPwClfH/0W7ZN73pTO4=
 gopkg.in/gographics/imagick.v2 v2.6.3/go.mod h1:/QVPLV/iKdNttRKthmDkeeGg+vdHurVEPc8zkU0XgBk=

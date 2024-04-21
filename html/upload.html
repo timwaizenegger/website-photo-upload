@@ -35,9 +35,11 @@
 
             <h2 class="text-center">Foto Sharing</h2>
 
-            <button id="custom-upload-button" type="button" class="btn btn-lg btn-success text-center">Bilder auswählen &
+            <button id="custom-upload-button" type="button" class="btn btn-lg btn-success text-center">Bilder auswählen
+                &
                 hochladen
             </button>
+            <p class="bg-success" id="msg-fertig" hidden="true">Fertig!</p>
             <form id="imageForm" action="upload" method="POST" enctype="multipart/form-data">
                 <input class="btn btn-lg btn-primary" id="imageInput" name="imageInputName" type="file" accept="image/*"
                        style="display: none;" multiple>
@@ -74,6 +76,16 @@
                 progressbarbs.style.width = percentComplete + '%';
                 progressbarbs.setAttribute('aria-valuenow', percentComplete);
                 progressbarbs.innerText = percentComplete + '%';
+
+                msgfertig = document.getElementById('msg-fertig');
+
+                if (event.loaded == event.total) {
+                    progressbarbs.hidden = true;
+                    msgfertig.hidden = false;
+                } else {
+                    progressbarbs.hidden = false;
+                    msgfertig.hidden = true;
+                }
             }
         };
 
@@ -120,9 +132,16 @@
 
         thumbnailsContainer.innerHTML = "";
 
+        var lastGroupName = "";
+
         data.forEach(item => {
 
-
+            if (lastGroupName != item.group_name) {
+                lastGroupName = item.group_name
+                const groupHead = document.createElement('h1');
+                groupHead.innerHTML =  item.group_name;
+                thumbnailsContainer.appendChild(groupHead)
+            }
             //
             // const thumbnailHeaderH3 = document.createElement('h3')
             // thumbnailHeaderH3.classList.add('panel-title');

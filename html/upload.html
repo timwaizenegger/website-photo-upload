@@ -128,9 +128,7 @@
         const response = await fetch(API_ENDPOINT);
         const data = await response.json();
 
-        const thumbnailsContainer = document.getElementById('thumbnails');
-
-        thumbnailsContainer.innerHTML = "";
+        const thumbnailsContainer = document.createElement('div');
 
         var lastGroupName = "";
 
@@ -139,7 +137,7 @@
             if (lastGroupName != item.group_name) {
                 lastGroupName = item.group_name
                 const groupHead = document.createElement('h1');
-                groupHead.innerHTML =  item.group_name;
+                groupHead.innerHTML = item.group_name;
                 thumbnailsContainer.appendChild(groupHead)
             }
             //
@@ -179,12 +177,14 @@
             //
             // thumbnailsContainer.appendChild(thumbnailPanelDiv);
         });
+        const actualThumbnailsContainer = document.getElementById('thumbnails');
+        actualThumbnailsContainer.innerHTML = thumbnailsContainer.innerHTML;
     }
 
     renderThumbnails();
     setInterval(function () {
         renderThumbnails();
-    }, 30000);
+    }, 10000);
 </script>
 
 

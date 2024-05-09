@@ -198,7 +198,7 @@ func main() {
 	//mux.Handle("/html/", http.StripPrefix("/html/", http.FileServer(http.Dir("./html"))))
 	mux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images/"))))
 	mux.HandleFunc("/api/thumbs", jsonDirList)
-	mux.HandleFunc("/", serveMainPage)
+	//mux.HandleFunc("/", serveMainPage)
 	mux.HandleFunc("GET /{$}", serveMainPage)
 	mux.HandleFunc("GET /upload", serveMainPage)
 	mux.HandleFunc("POST /upload", putUpload)

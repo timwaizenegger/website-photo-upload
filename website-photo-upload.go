@@ -21,10 +21,13 @@ import (
 
 var (
 	mw *imagick.MagickWand
+	// tzLocation is the location of the local time; will be initialized in main. If not we panic
+	tzLocation *time.Location
 )
 
 const (
 	bindHost          = "0.0.0.0:3333"
+	localTimezone     = "Europe/Berlin"
 	imagePath         = "./images/"
 	thumbPath         = "./images/thumbs/"
 	thumbSuffix       = ".thumb.jpg"
@@ -81,8 +84,9 @@ func getExifDate(file *[]byte) time.Time {
 
 	dt, err := x.DateTime()
 	if err != nil {
-		log.Printf("can't get DateTime from exif: %s", err)
-		return time.Now()
+		local := time.Now().In(tzLocation)
+		log.Printf("can't get DateTime from exif: %s, falling back to local time %s", err, local)
+		return local
 	}
 	//dateTime, _ := x.Get(exif.DateTime)
 	//fmt.Println("Date Time:", dateTime)
@@ -184,6 +188,12 @@ func main() {
 
 	mw = imagick.NewMagickWand()
 
+	var err error
+	tzLocation, err = time.LoadLocation(localTimezone)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	mux := http.NewServeMux()
 	//mux.Handle("/html/", http.StripPrefix("/html/", http.FileServer(http.Dir("./html"))))
 	mux.Handle("/images/", http.StripPrefix("/images/", http.FileServer(http.Dir("./images/"))))
@@ -195,7 +205,7 @@ func main() {
 
 	log.Printf("starting server on %s", bindHost)
 	//err := http.ListenAndServe("127.0.0.1:3333", mux)
-	err := http.ListenAndServe(bindHost, mux)
+	err = http.ListenAndServe(bindHost, mux)
 	if err != nil {
 		log.Fatal(err)
 	}

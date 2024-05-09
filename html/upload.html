@@ -28,20 +28,20 @@
         crossorigin="anonymous"></script>
 
 
-<div class="container">
+<div class="container-fluid">
     <div class="row">
         <div class="col">
             <h1 class="text-center">Katharina & Tim 💍</h1>
 
             <h2 class="text-center">Foto Sharing</h2>
-
-            <button id="custom-upload-button" type="button" class="btn btn-lg btn-success text-center">Bilder auswählen
+            <button id="custom-upload-button" type="button" class="btn btn-lg btn-warning text-center">📷 Bilder auswählen
                 &
                 hochladen
             </button>
             <p class="bg-success" id="msg-fertig" hidden="true">Fertig!</p>
+
             <form id="imageForm" action="upload" method="POST" enctype="multipart/form-data">
-                <input class="btn btn-lg btn-primary" id="imageInput" name="imageInputName" type="file" accept="image/*"
+                <input id="imageInput" name="imageInputName" type="file" accept="image/*"
                        style="display: none;" multiple>
                 <input type="submit" style="display: none;">
             </form>
@@ -51,7 +51,7 @@
                 <div id="progressbarbs" class="progress-bar progress-bar-striped" role="progressbar"></div>
             </div>
 
-            <h2>💝</h2>
+            <p class="text-info">ℹ️ Die Bilder sind nach Aufnahmezeit sortiert, neueste oben.</p>
         </div>
     </div>
 </div>
@@ -136,21 +136,15 @@
 
             if (lastGroupName != item.group_name) {
                 lastGroupName = item.group_name
-                const groupHead = document.createElement('h1');
+                const groupHead = document.createElement('h2');
                 groupHead.innerHTML = item.group_name;
                 thumbnailsContainer.appendChild(groupHead)
             }
-            //
-            // const thumbnailHeaderH3 = document.createElement('h3')
-            // thumbnailHeaderH3.classList.add('panel-title');
-            // thumbnailHeaderH3.textContent = item.name
-            //
-            // const thumbnailHeaderDiv = document.createElement('div');
-            // thumbnailHeaderDiv.classList.add('panel-heading');
-            // thumbnailHeaderDiv.appendChild(thumbnailHeaderH3)
+
 
             const thumbLink = document.createElement('a');
             thumbLink.href = item.img_path;
+            //thumbLink.download = "";
 
             const thumbnailImg = document.createElement('img');
             thumbnailImg.classList.add("img-thumbnail")
@@ -161,24 +155,11 @@
 
             thumbnailsContainer.appendChild(thumbLink)
 
-            // const thumbnailDiv = document.createElement('div');
-            // thumbnailDiv.classList.add('panel-body');
-            // thumbnailDiv.appendChild(thumbnailImg);
-            //
-            // const thumbnailPanelDiv = document.createElement('div');
-            // thumbnailPanelDiv.classList.add("panel")
-            // thumbnailPanelDiv.classList.add("panel-success")
-            // thumbnailPanelDiv.classList.add('col-sm-6');
-            // thumbnailPanelDiv.classList.add('col-lg-3');
-            // thumbnailPanelDiv.appendChild(thumbnailDiv)
-            // thumbnailPanelDiv.appendChild(thumbnailHeaderDiv)
-            //
-            //
-            //
-            // thumbnailsContainer.appendChild(thumbnailPanelDiv);
         });
         const actualThumbnailsContainer = document.getElementById('thumbnails');
-        actualThumbnailsContainer.innerHTML = thumbnailsContainer.innerHTML;
+        if (actualThumbnailsContainer.innerHTML !== thumbnailsContainer.innerHTML) {
+            actualThumbnailsContainer.innerHTML = thumbnailsContainer.innerHTML;
+        }
     }
 
     renderThumbnails();
